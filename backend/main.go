@@ -3,6 +3,8 @@ package main
 import (
 	"foodList/authentication"
 	"foodList/controllers"
+	"foodList/database"
+	"foodList/models"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +18,10 @@ func main() {
 }
 
 func loadDatabase() {
+	database.ConnectToDatabase()
+	database.DB.AutoMigrate(&models.Order{})
+	database.DB.AutoMigrate(&models.OrderItem{})
+	database.DB.AutoMigrate(&models.Restaurant{})
 }
 
 func loadEnv() {
