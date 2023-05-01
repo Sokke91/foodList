@@ -1,6 +1,7 @@
 package models
 
 import (
+	"foodList/database"
 	"time"
 
 	"gorm.io/gorm"
@@ -11,23 +12,31 @@ type Order struct {
 	ID        int       `gorm:"primaryKey;not null"`
 	OrderDate time.Time `gorm:"not null"`
 	LastOrder time.Time `gorm:"not null"`
-	active    bool      `gorm:"not null; default:true"`
+	Active    bool      `gorm:"not null; default:true"`
 }
 
-type OrderItem struct {
-	gorm.Model
-	ID          int     `gorm:"primaryKey;not null"`
-	Name        string  `gorm:"not null;size:255"`
-	OrderNumber string  `gorm:"not null; size:255"`
-	Costs       float32 `gorm:"not null"`
-	Payed       float32 `gorm:""`
-	Comment     string  `gorm:"size:255"`
+// Order Model
+func (order *Order) Save() (*Order, error) {
+	err := database.DB.Create(&order).Error
+	if err != nil {
+		return &Order{}, err
+	}
+	return order, nil
 }
 
-type Restaurant struct {
-	gorm.Model
-	ID          int    `gorm:"primaryKey;not null"`
-	Name        string `gorm:"not null; size:255"`
-	PhoneNumber string `gorm:"not null;size:255"`
-	Card        string `gorm:"not null;size:255"`
+func GetOrderById(id int) (Order, error) {
+	var order Order
+	err := database.DB.First(&order, id).Error
+	if err != nil {
+		return Order{}, err
+	}
+	return order, nil
+}
+
+func (order *Order) Delete() error {
+	err := database.DB.Delete(&order).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
